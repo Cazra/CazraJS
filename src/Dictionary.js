@@ -45,7 +45,7 @@ _.extend(Cazra.Dictionary.prototype, {
      * @param  {Object} [options]
      *         success: function(size: int)
      *         failure: function(error: Cazra.Error)
-     * @return {[type]}         [description]
+     * @return {int}
      */
     getSize: function(options) {
         if(options) {
