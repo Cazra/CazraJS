@@ -5,7 +5,7 @@
  *        a stringified JSON object of word:definition pairs.
  */
 Cazra.Dictionary = function(srcUrl) {
-    this._srcUrl;
+    this._srcUrl = srcUrl;
     this._isLoaded = false;
     this._dictionary = {};
 };
@@ -99,7 +99,7 @@ _.extend(Cazra.Dictionary.prototype, {
             var result = [];
 
             _.each(this._dictionary, function(definition, word) {
-                if(filter(word, definition)
+                if(filter(word, definition))
                     result.push(word);
             }, this);
 

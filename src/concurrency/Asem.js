@@ -15,6 +15,13 @@ Cazra.Asem = function(initLock, callback, scope) {
     this._callback = callback;
     this._scope = scope;
     this._isFired = false;
+
+    if(Cazra.Asem.debug) {
+        Cazra.Asem.assignId(this);
+
+        console.info('Created Asem: ', this);
+        Cazra.Asem.debug._activeAsems.push(this);
+    }
 };
 
 _.extend(Cazra.Asem.prototype, {
@@ -38,6 +45,7 @@ _.extend(Cazra.Asem.prototype, {
             else {
                 this._isFired = true;
                 _.callback(this._callback, this._scope, []);
+            }
         }
         else if(this._lock < 0) {
             throw new Cazra.Error('AsemError', 'Cannot signal asynchronous semaphore with a lock value that is already 0.');
@@ -55,6 +63,10 @@ _.extend(Cazra.Asem.prototype, {
         };
     },
 
+    toString: function() {
+
+    },
+
     /**
      * Increments the lock.
      */
@@ -63,5 +75,80 @@ _.extend(Cazra.Asem.prototype, {
             throw new Cazra.Error('AsemError', 'Cannot wait asynchronous semaphore that has already been fired.');
         this._lock++;
     }
+});
 
+/**
+ * Static properties.
+ */
+_.extend(Cazra.Asem, {
+    /**
+     * Set this to true to enable debugging of Asems.
+     * With debugging turned on, you can keep track of Asems that haven't been
+     * fired yet.
+     * Also, with debug on, messages will be printed to the console when Asems
+     * are created, waited, signaled, and fired.
+     * @type {Boolean}
+     */
+    debug: false,
+
+    _nextId: 0,
+    _activeAsems: [],
+
+
+
+    /**
+     * @private
+     * @param  {Cazra.Asem} asem
+     */
+    _debugCreate: function(asem) {
+        if(this.debug) {
+            asem._id = this._nextId;
+            this._nextId++;
+
+            this._activeAsems.push(asem);
+
+            console.info('Created Asem: ', asem);
+        }
+    },
+
+    /**
+     * @private
+     * @param  {Cazra.Asem} asem
+     */
+    _debugFire: function(asem) {
+        if(this.debug) {
+            var index = this._activeAsems.indexOf(asem);
+            this._activeAsems.splice(index, 1);
+
+            console.info('Fired Asem: ', asem);
+        }
+    },
+
+    /**
+     * @private
+     * @param  {Cazra.Asem} asem
+     */
+    _debugSignal: function(asem) {
+        if(this._debug) {
+            console.info('Signaled Asem: ', asem, asem._lock);
+        }
+    },
+
+    /**
+     * @private
+     * @param  {Cazra.Asem} asem
+     */
+    _debugWait: function(asem) {
+        if(this._debug)
+            console.info('Waited Asem: ', asem, asem._lock);
+    },
+
+
+    /**
+     * Returns the list of Asems that haven't been fired yet.
+     * @return {[type]} [description]
+     */
+    getUnfiredAsems: function() {
+        return _.clone(this._activeAsems);
+    }
 });

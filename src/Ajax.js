@@ -43,8 +43,10 @@ Cazra.Ajax = (function() {
             xhr.addEventListener('load', function(evt) {
                 console.log('AjaxLoadEvent:', evt);
 
-                if(xhr.status >= 200 && xhr.status < 300)
-                    _.callback();
+                if(xhr.status == 200)
+                    _.callback(options.success, options.scope, [xhr]);
+                else
+                    _.callback(options.failure, options.failure, [new Cazra.Error('AjaxError', status + ' ' + message)]);
             });
         },
 
